@@ -438,6 +438,36 @@ Definition needs_block (t : term) : bool :=
   | _ => false
   end.
 
+Program Definition print_primitive (p : EPrimitive.prim_val term) : PrettyPrinter unit :=
+  match projT1 p with
+  | Primitive.primInt =>
+      match projT2 p with
+      | EPrimitive.primIntModel i =>
+          append (Show.string_of_prim_int i);;
+          append "_i64"
+      | _ => printer_fail "Primitive integer was not an integer"
+      end
+  | Primitive.primFloat =>
+      match projT2 p with
+      | EPrimitive.primFloatModel f =>
+          append (Show.string_of_float f);;
+          append "_f64"
+      | _ => printer_fail "Primitive float was not a float"
+      end
+  | Primitive.primString =>
+      match projT2 p with
+      | EPrimitive.primStringModel f =>
+          append (Show.string_of_pstring f);;
+          append "_f64"
+      | _ => printer_fail "Primitive string was not a string"
+      end
+  | Primitive.primArray =>
+      match projT2 p with
+      | EPrimitive.primArrayModel a => printer_fail "ERROR: can't yet print primitive arrays"
+      | _ => printer_fail "Primitive array was not an array"
+      end
+  end.
+
 Fixpoint print_term (Γ : list ident) (t : term) {struct t} : PrettyPrinter unit :=
   match t with
   | tBox => append term_box_symbol
@@ -616,8 +646,9 @@ Fixpoint print_term (Γ : list ident) (t : term) {struct t} : PrettyPrinter unit
     append ".";;
     append (string_of_nat c)
 
+  | tPrim p => print_primitive p
+
   | tCoFix _ _ => printer_fail "Cannot handle tCoFix yet"
-  | tPrim _ => printer_fail "Cannot handle Coq primitive types yet"
   | tLazy _ => printer_fail "Cannot handle lazy yet"
   | tForce _ => printer_fail "Cannot handle force yet"
   end.
