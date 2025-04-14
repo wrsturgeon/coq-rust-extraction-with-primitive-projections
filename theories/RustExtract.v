@@ -101,9 +101,87 @@ Definition get_ind_ident (ind : inductive) : PrettyPrinter _ :=
     ret (ty_const_global_ident_of_kername kn)
   end.
 
+Definition avoid_reserved_names (id : ident) : ident :=
+  match id with
+  (* Official list can be found at <https://doc.rust-lang.org/reference/keywords.html> *)
+
+  (* Strict keywords: *)
+  | "as"
+  | "break"
+  | "const"
+  | "continue"
+  | "crate"
+  | "else"
+  | "enum"
+  | "extern"
+  | "false"
+  | "fn"
+  | "for"
+  | "if"
+  | "impl"
+  | "in"
+  | "let"
+  | "loop"
+  | "match"
+  | "mod"
+  | "move"
+  | "mut"
+  | "pub"
+  | "ref"
+  | "return"
+  | "self"
+  | "Self"
+  | "static"
+  | "struct"
+  | "super"
+  | "trait"
+  | "true"
+  | "type"
+  | "unsafe"
+  | "use"
+  | "where"
+  | "while"
+
+  (* Strict since 2018: *)
+  | "async"
+  | "await"
+  | "dyn"
+
+  (* Reserved keywords: *)
+  | "abstract"
+  | "become"
+  | "box"
+  | "do"
+  | "final"
+  | "macro"
+  | "override"
+  | "priv"
+  | "typeof"
+  | "unsized"
+  | "virtual"
+  | "yield"
+
+  (* Reserved since 2018: *)
+  | "try"
+
+  (* Reserved since 2024: *)
+  | "gen"
+
+  (* Weak keywords: *)
+  | "macro_rules"
+  | "union"
+  | "'static"
+  | "safe"
+  | "raw"
+
+      => "r#" ^ id
+
+  | _ => id
+  end.
+
 (* Fine to remove primes here as we generate fresh names *)
 Definition clean_local_ident (name : ident) : string :=
-  remove_char "'" name.
+  remove_char "'" (avoid_reserved_names name).
 
 Definition is_polymorphic (cst : Ex.constant_body) : bool :=
   (0 <? #|fst (Ex.cst_type cst)|)%nat.
@@ -166,88 +244,6 @@ Definition fresh (name : ident) (used : list ident) : ident :=
     name.
 
 Import BasicAst.
-
-Definition avoid_reserved_names (n : name) : name :=
-  match n with
-  | nAnon => nAnon
-  | nNamed ident => nNamed (
-      match ident with
-      (* Official list can be found at <https://doc.rust-lang.org/reference/keywords.html> *)
-
-      (* Strict keywords: *)
-      | "as"
-      | "break"
-      | "const"
-      | "continue"
-      | "crate"
-      | "else"
-      | "enum"
-      | "extern"
-      | "false"
-      | "fn"
-      | "for"
-      | "if"
-      | "impl"
-      | "in"
-      | "let"
-      | "loop"
-      | "match"
-      | "mod"
-      | "move"
-      | "mut"
-      | "pub"
-      | "ref"
-      | "return"
-      | "self"
-      | "Self"
-      | "static"
-      | "struct"
-      | "super"
-      | "trait"
-      | "true"
-      | "type"
-      | "unsafe"
-      | "use"
-      | "where"
-      | "while"
-
-      (* Strict since 2018: *)
-      | "async"
-      | "await"
-      | "dyn"
-
-      (* Reserved keywords: *)
-      | "abstract"
-      | "become"
-      | "box"
-      | "do"
-      | "final"
-      | "macro"
-      | "override"
-      | "priv"
-      | "typeof"
-      | "unsized"
-      | "virtual"
-      | "yield"
-
-      (* Reserved since 2018: *)
-      | "try"
-
-      (* Reserved since 2024: *)
-      | "gen"
-
-      (* Weak keywords: *)
-      | "macro_rules"
-      | "union"
-      | "'static"
-      | "safe"
-      | "raw"
-
-          => "r#" ^ ident
-
-      | _ => ident
-      end)
-  end.
 
 Definition fresh_ident (name : name) (Γ : list ident) : PrettyPrinter ident :=
   used_names <- get_used_names;;
