@@ -4,6 +4,7 @@
 
 # Nix outputs
 result
+.direnv
 
 ##Coq
 *.vo

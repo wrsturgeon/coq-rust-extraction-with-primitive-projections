@@ -590,8 +590,12 @@ Fixpoint print_term (Γ : list ident) (t : term) {struct t} : PrettyPrinter unit
     append ((nth i cells "") ++ ".get().unwrap()");;
     pop_indent
 
+  (* Primitive projections.
+   * Variant defined in `erasure/theories/EAst.v:term`.
+   * First argument is `common/theories/Kernames.v:projection` (record matched using its only constructor);
+   * second argument is recursive (`erasure/theories/EAst.v:term`). *)
   | tProj (mkProjection ind pars c) t =>
-    printer_fail ("unhandled tProj on " ^ (string_of_kername (inductive_mind ind)))
+    printer_fail ("unhandled primitive projection (`tProj`) on `" ^ (string_of_kername (inductive_mind ind)) ^ "`: `mkProjection " ^ string_of_inductive ind ^ " " ^ string_of_nat pars ^ " " ^ string_of_nat c ^ "`")
 
   | tCoFix _ _ => printer_fail "Cannot handle tCoFix yet"
   | tPrim _ => printer_fail "Cannot handle Coq primitive types yet"
