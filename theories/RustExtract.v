@@ -595,7 +595,26 @@ Fixpoint print_term (Γ : list ident) (t : term) {struct t} : PrettyPrinter unit
    * First argument is `common/theories/Kernames.v:projection` (record matched using its only constructor);
    * second argument is recursive (`erasure/theories/EAst.v:term`). *)
   | tProj (mkProjection ind pars c) t =>
-    printer_fail ("unhandled primitive projection (`tProj`) on `" ^ (string_of_kername (inductive_mind ind)) ^ "`: `tProj (mkProjection { proj_ind := mkInd { inductive_mind := " ^ (string_of_kername (inductive_mind ind)) ^ "; inductive_ind := " ^ (string_of_nat (inductive_ind ind)) ^ " }; proj_npars := " ^ string_of_nat pars ^ "; proj_arg := " ^ string_of_nat c ^ "; }) (" ^ EAstUtils.string_of_term t ^ ")`")
+    (*
+    printer_fail (
+      "unhandled primitive projection (`tProj`) on `" ^
+      (string_of_kername (inductive_mind ind)) ^
+      "`: `tProj (mkProjection { proj_ind := mkInd { inductive_mind := " ^
+      (string_of_kername (inductive_mind ind)) ^
+      "; inductive_ind := " ^
+      (string_of_nat (inductive_ind ind)) ^
+      " }; proj_npars := " ^
+      string_of_nat pars ^
+      "; proj_arg := " ^
+      string_of_nat c ^
+      "; }) (" ^
+      EAstUtils.string_of_term t ^
+      ")`"
+    )
+    *)
+    print_term Γ t;;
+    append ".";;
+    append (string_of_nat c)
 
   | tCoFix _ _ => printer_fail "Cannot handle tCoFix yet"
   | tPrim _ => printer_fail "Cannot handle Coq primitive types yet"
